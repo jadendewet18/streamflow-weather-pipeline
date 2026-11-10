@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamFlow | Operations Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary-blue: #2563eb;
+            --accent-green: #16a34a;
+            --accent-red: #dc2626;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 48px 24px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 6px 0;
+            letter-spacing: -0.01em;
+            color: var(--text-main);
+        }
+
+        p.subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px 20px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        /* Purposeful status badges using blue, green, and red */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-clear {
+            background-color: #eff6ff;
+            color: var(--primary-blue);
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-normal {
+            background-color: #f0fdf4;
+            color: var(--accent-green);
+            border: 1px solid #bbf7d0;
+        }
+
+        .badge-hot {
+            background-color: #fef2f2;
+            color: var(--accent-red);
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>StreamFlow Pipeline Monitor</h1>
+            <p class="subtitle">Live telemetry recorded from the SQLite operational database</p>
+        </header>
+        
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Recorded Timestamp</th>
+                        <th>Temperature</th>
+                        <th>Humidity</th>
+                        <th>Wind Speed</th>
+                        <th>Condition Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if records %}
+                        {% for row in records %}
+                        <tr>
+                            <td>#{{ row['id'] }}</td>
+                            <td>{{ row['recorded_at'] }}</td>
+                            <td><strong>{{ row['temperature'] }}°C</strong></td>
+                            <td>{{ row['humidity'] }}%</td>
+                            <td>{{ row['wind_speed'] }} km/h</td>
+                            <td>
+                                {% if row['weather_condition'] == 'Hot' %}
+                                    <span class="badge badge-hot">{{ row['weather_condition'] }}</span>
+                                {% elif row['weather_condition'] == 'Clear' %}
+                                    <span class="badge badge-clear">{{ row['weather_condition'] }}</span>
+                                {% else %}
+                                    <span class="badge badge-normal">{{ row['weather_condition'] }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                No weather records found. Run your pipeline to populate data.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
